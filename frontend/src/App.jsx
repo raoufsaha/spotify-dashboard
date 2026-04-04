@@ -3,6 +3,8 @@ import NowPlaying from "./components/NowPlaying"
 import TopTracks from "./components/TopTracks"
 import TopArtists from "./components/TopArtists"
 
+// Just to add a commit
+
 const API_URL = import.meta.env.VITE_API_URL || "http://127.0.0.1:8000"
 
 const TIME_RANGES = [

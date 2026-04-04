@@ -3,6 +3,7 @@ from fastapi.responses import RedirectResponse
 from fastapi.middleware.cors import CORSMiddleware
 import httpx
 import os
+import json
 from dotenv import load_dotenv
 import urllib.parse
 import secrets
@@ -23,7 +24,19 @@ CLIENT_ID = os.getenv("SPOTIFY_CLIENT_ID")
 CLIENT_SECRET = os.getenv("SPOTIFY_CLIENT_SECRET")
 REDIRECT_URI = os.getenv("SPOTIFY_REDIRECT_URI")
 
-token_store = {"access_token": None, "refresh_token": None}
+TOKEN_FILE = "tokens.json"
+
+def load_tokens():
+    if os.path.exists(TOKEN_FILE):
+        with open(TOKEN_FILE, "r") as f:
+            return json.load(f)
+    return {"access_token": None, "refresh_token": None}
+
+def save_tokens(tokens):
+    with open(TOKEN_FILE, "w") as f:
+        json.dump(tokens, f)
+
+token_store = load_tokens()
 
 # Step 1: Send user to Spotify login
 @app.get("/login")
@@ -57,6 +70,7 @@ async def callback(code: str, state: str):
     tokens = response.json()
     token_store["access_token"] = tokens["access_token"]
     token_store["refresh_token"] = tokens["refresh_token"]
+    save_tokens(token_store)
     return {"message": "Login successful", "tokens": token_store}
 
 # Step 3: Refresh the access token when it expires
@@ -72,6 +86,7 @@ async def refresh_access_token():
             auth=(CLIENT_ID, CLIENT_SECRET),
         )
     token_store["access_token"] = response.json()["access_token"]
+    save_tokens(token_store)
 
 # Step 4: Now playing endpoint
 @app.get("/now-playing")

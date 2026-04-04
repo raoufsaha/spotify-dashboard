@@ -7,7 +7,7 @@ from dotenv import load_dotenv
 import urllib.parse
 import secrets
 
-load_dotenv()
+load_dotenv(override=False)
 
 app = FastAPI()
 

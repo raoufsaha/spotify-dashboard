@@ -148,3 +148,10 @@ async def top_artists(time_range: str = "short_term"):
             for a in data["items"]
         ]
     }
+
+@app.get("/debug")
+def debug():
+    return {
+        "client_id": os.getenv("SPOTIFY_CLIENT_ID"),
+        "redirect_uri": os.getenv("SPOTIFY_REDIRECT_URI"),
+    }

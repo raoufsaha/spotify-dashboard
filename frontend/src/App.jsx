@@ -3,6 +3,8 @@ import NowPlaying from "./components/NowPlaying"
 import TopTracks from "./components/TopTracks"
 import TopArtists from "./components/TopArtists"
 
+const API_URL = import.meta.env.VITE_API_URL || "http://127.0.0.1:8000"
+
 const TIME_RANGES = [
   { label: "1 Month", value: "short_term" },
   { label: "6 Months", value: "medium_term" },
@@ -72,7 +74,7 @@ function App() {
 
   const fetchNowPlaying = async () => {
     try {
-      const res = await fetch("http://127.0.0.1:8000/now-playing")
+      const res = await fetch(`${API_URL}/now-playing`)
       const data = await res.json()
       setNowPlaying(data)
     } catch (err) {
@@ -82,7 +84,7 @@ function App() {
 
   const fetchTopTracks = async (range) => {
     try {
-      const res = await fetch(`http://127.0.0.1:8000/top-tracks?time_range=${range}`)
+      const res = await fetch(`${API_URL}/top-tracks?time_range=${range}`)
       const data = await res.json()
       setTopTracks(data.tracks)
     } catch (err) {
@@ -92,7 +94,7 @@ function App() {
 
   const fetchTopArtists = async (range) => {
     try {
-      const res = await fetch(`http://127.0.0.1:8000/top-artists?time_range=${range}`)
+      const res = await fetch(`${API_URL}/top-artists?time_range=${range}`)
       const data = await res.json()
       setTopArtists(data.artists)
     } catch (err) {

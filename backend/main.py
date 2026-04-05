@@ -7,6 +7,7 @@ import json
 from dotenv import load_dotenv
 import urllib.parse
 import secrets
+import redis
 
 load_dotenv(override=False)
 
@@ -24,17 +25,27 @@ CLIENT_ID = os.getenv("SPOTIFY_CLIENT_ID")
 CLIENT_SECRET = os.getenv("SPOTIFY_CLIENT_SECRET")
 REDIRECT_URI = os.getenv("SPOTIFY_REDIRECT_URI")
 
-TOKEN_FILE = "tokens.json"
+REDIS_URL = os.getenv("REDIS_URL")
+
+if REDIS_URL:
+    r = redis.from_url(REDIS_URL, decode_responses=True)
+else:
+    r = None
 
 def load_tokens():
-    if os.path.exists(TOKEN_FILE):
-        with open(TOKEN_FILE, "r") as f:
-            return json.load(f)
+    if r:
+        access_token = r.get("access_token")
+        refresh_token = r.get("refresh_token")
+        return {
+            "access_token": access_token,
+            "refresh_token": refresh_token
+        }
     return {"access_token": None, "refresh_token": None}
 
 def save_tokens(tokens):
-    with open(TOKEN_FILE, "w") as f:
-        json.dump(tokens, f)
+    if r:
+        r.set("access_token", tokens["access_token"] or "")
+        r.set("refresh_token", tokens["refresh_token"] or "")
 
 token_store = load_tokens()
 
